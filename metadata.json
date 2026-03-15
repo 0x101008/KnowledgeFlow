@@ -1,5 +1,5 @@
 {
-  "name": "Remix: Remix: 智图流 (Knowledge Flow)",
+  "name": "智图流 (Knowledge Flow)",
   "description": "一个基于 AI 的自适应知识图谱与闯关学习平台，通过实时生成的技能树和互动式问答，为用户量身定制学习路径。",
   "requestFramePermissions": [
     "camera",
