@@ -10,7 +10,7 @@ npm run build
 set -e
 cd dist
 echo "已成功进入目录打包...正在进行打包"
-zip -r ../zip/dist.zip ./
+7z -r ../zip/dist.zip ./
 echo "已经成功打包"
 
 echo "***** 上传中 *****"
