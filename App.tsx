@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import LZString from 'lz-string';
 import { 
   LLMConfig, 
   KnowledgeNode, 
@@ -110,6 +111,53 @@ const App: React.FC = () => {
       document.body.classList.remove('bg-gray-900');
     }
   }, [config.theme]);
+
+  // Handle shared report from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reportParam = params.get('report');
+    if (reportParam) {
+      try {
+        // Try LZString first
+        let decompressed = LZString.decompressFromEncodedURIComponent(reportParam);
+        let decoded;
+        
+        if (decompressed) {
+          decoded = JSON.parse(decompressed);
+        } else {
+          // Fallback to old base64 method just in case
+          decoded = JSON.parse(decodeURIComponent(atob(reportParam)));
+        }
+
+        if (decoded && decoded.summary) {
+          setTopic(decoded.topic || '');
+          setSummary(decoded.summary);
+          setActiveView('summary');
+          
+          // Clean up the URL so refreshing doesn't keep showing the report if they navigate away
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete('report');
+          window.history.replaceState({}, '', newUrl.toString());
+        }
+      } catch (e) {
+        console.error("Failed to parse shared report", e);
+      }
+    }
+  }, []);
+
+  const shareUrl = useMemo(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (summary) {
+        const shareData = { topic, summary };
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
+        url.searchParams.set('report', compressed);
+      }
+      return url.toString();
+    } catch (e) {
+      return window.location.href;
+    }
+  }, [summary, topic]);
 
   // --- Actions ---
   const startJourney = async (existingHistory?: HistoryItem, overrideTopic?: string) => {
@@ -498,7 +546,7 @@ const App: React.FC = () => {
         <ShareModal 
           isOpen={showShareModal} 
           onClose={() => setShowShareModal(false)} 
-          url={window.location.href} 
+          url={shareUrl} 
           title={`我在智图流完成了关于「${topic || '知识点'}」的学习，快来看看我的学习报告吧！`} 
           theme={config.theme} 
         />
@@ -529,3 +577,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+//114514

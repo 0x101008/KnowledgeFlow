@@ -62,7 +62,14 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url, ti
 
         <div className="flex flex-col items-center mb-8">
           <div className={`p-4 rounded-2xl mb-4 ${isDark ? 'bg-white' : 'bg-gray-50'}`}>
-            <QRCodeSVG value={url} size={160} level="H" includeMargin={false} />
+            {url.length > 2500 ? (
+              <div className="w-40 h-40 flex flex-col items-center justify-center text-center text-gray-400">
+                <p className="text-sm">内容过长</p>
+                <p className="text-xs mt-2">请直接复制下方链接分享</p>
+              </div>
+            ) : (
+              <QRCodeSVG value={url} size={160} level="L" includeMargin={false} />
+            )}
           </div>
           <p className={`text-sm font-medium flex items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
             <MessageCircle size={16} /> 微信扫一扫分享
